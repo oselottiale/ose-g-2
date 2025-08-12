@@ -2,38 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Redirecting...</title>
-  <script>
-    async function redirectToGame() {
-      // Extract game ID from URL path
-      const pathParts = window.location.pathname.split('/');
-      const gameId = pathParts[pathParts.length - 1];
-
-      if (!gameId) {
-        alert('No game ID found in URL.');
-        return;
-      }
-
-      try {
-        const response = await fetch('https://www.onlinegames.io/media/plugins/genGames/embed.json');
-        const games = await response.json();
-
-        const game = games.find(g => g.id === gameId);
-        if (game && game.embed) {
-          window.location.href = game.embed;
-        } else {
-          alert('Game not found.');
-        }
-      } catch (error) {
-        console.error('Failed to fetch game list:', error);
-        alert('Error loading game data.');
-      }
+  <title>Select a Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 40px;
+      text-align: center;
     }
-
-    redirectToGame();
-  </script>
+    select, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to your game... 🎮</p>
+  <h1>🎮 Choose Your Game</h1>
+  <select id="gameSelector">
+    <option value="">-- Select a Game --</option>
+  </select>
+  <br>
+  <button id="playButton">Play Game</button>
+
+  <script>
+    const selector = document.getElementById('gameSelector');
+    const playButton = document.getElementById('playButton');
+    let gameMap = {};
+
+    fetch('https://www.onlinegames.io/media/plugins/genGames/embed.json')
+      .then(response => response.json())
+      .then(games => {
+        games.forEach(game => {
+          const option = document.createElement('option');
+          option.value = game.id; // assuming 'id' is the unique identifier
+          option.textContent = game.title;
+          selector.appendChild(option);
+          gameMap[game.id] = game; // store full game info if needed later
+        });
+      })
+      .catch(error => {
+        console.error('Error loading games:', error);
+        alert('Failed to load game list.');
+      });
+
+    playButton.addEventListener('click', () => {
+      const selectedId = selector.value;
+      if (selectedId) {
+        window.location.href = `play.html/${selectedId}`;
+      } else {
+        alert('Please select a game first!');
+      }
+    });
+  </script>
 </body>
 </html>
