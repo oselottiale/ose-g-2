@@ -2,58 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Select a Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      padding: 40px;
-      text-align: center;
-    }
-    select, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 10px;
-    }
-  </style>
+  <title>Game Vault</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-  <h1>🎮 Choose Your Game</h1>
-  <select id="gameSelector">
-    <option value="">-- Select a Game --</option>
-  </select>
-  <br>
-  <button id="playButton">Play Game</button>
+  <h1>🎮 Underground Game Vault</h1>
+  <div id="game-grid" class="grid"></div>
 
-  <script>
-    const selector = document.getElementById('gameSelector');
-    const playButton = document.getElementById('playButton');
-    let gameMap = {};
+  <div id="info-panel" class="info hidden">
+    <button id="close-btn">✖</button>
+    <h2 id="info-title"></h2>
+    <p id="info-desc"></p>
+    <div id="info-images"></div>
+  </div>
 
-    fetch('https://www.onlinegames.io/media/plugins/genGames/embed.json')
-      .then(response => response.json())
-      .then(games => {
-        games.forEach(game => {
-          const option = document.createElement('option');
-          option.value = game.id; // assuming 'id' is the unique identifier
-          option.textContent = game.title;
-          selector.appendChild(option);
-          gameMap[game.id] = game; // store full game info if needed later
-        });
-      })
-      .catch(error => {
-        console.error('Error loading games:', error);
-        alert('Failed to load game list.');
-      });
-
-    playButton.addEventListener('click', () => {
-      const selectedId = selector.value;
-      if (selectedId) {
-        window.location.href = `play.html/${selectedId}`;
-      } else {
-        alert('Please select a game first!');
-      }
-    });
-  </script>
+  <script src="/assets/js/main.js"></script>
 </body>
 </html>
