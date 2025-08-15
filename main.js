@@ -1,37 +1,29 @@
+const lists = [1, 2]; // Add more list IDs here
 const grid = document.getElementById('game-grid');
-const panel = document.getElementById('info-panel');
-const title = document.getElementById('info-title');
-const desc = document.getElementById('info-desc');
-const images = document.getElementById('info-images');
-const closeBtn = document.getElementById('close-btn');
 
-fetch('games.json')
-  .then(res => res.json())
-  .then(games => {
-    games.forEach(game => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <img src="${game.image}" alt="${game.title}">
-        <h3>${game.title}</h3>
-      `;
-      card.onclick = () => showInfo(game);
-      grid.appendChild(card);
-    });
-  });
+lists.forEach(listId => {
+  fetch(`data/list${listId}.json`)
+    .then(res => res.json())
+    .then(data => {
+      data.games.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.onclick = () => {
+          window.location.href = `play.html/${listId}/${game.id}`;
+        };
 
-function showInfo(game) {
-  title.textContent = game.title;
-  desc.textContent = game.description;
-  images.innerHTML = '';
-  game.screenshots.forEach(src => {
-    const img = document.createElement('img');
-    img.src = src;
-    images.appendChild(img);
-  });
-  panel.classList.add('visible');
-}
+        const img = document.createElement('img');
+        img.src = game.image;
+        img.alt = game.title;
 
-closeBtn.onclick = () => {
-  panel.classList.remove('visible');
-};
+        const title = document.createElement('div');
+        title.className = 'card-title';
+        title.textContent = game.title;
+
+        card.appendChild(img);
+        card.appendChild(title);
+        grid.appendChild(card);
+      });
+    })
+    .catch(err => console.error(`Error loading list ${listId}:`, err));
+});
