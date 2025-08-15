@@ -27,3 +27,4 @@ lists.forEach(listId => {
     })
     .catch(err => console.error(`Error loading list ${listId}:`, err));
 });
+
