@@ -85,6 +85,20 @@
 
   const container = document.getElementById("game-container");
 
+  const iframe = document.createElement("iframe");
+  iframe.src = game.embed;
+    
+    // Use fallback dimensions if not provided
+  iframe.width = game.width ?? DEFAULT_WIDTH;
+  iframe.height = game.height ?? DEFAULT_HEIGHT;
+    
+    // Optional: make it responsive
+  iframe.style.maxWidth = "100%";
+  iframe.style.border = "none";
+  iframe.allowFullscreen = true;
+    
+  container.appendChild(iframe);
+
   // Helper function to show error messages
   function showError(message) {
     container.innerHTML = `<div class="error">${message}</div>`;
@@ -132,6 +146,7 @@
     });
 </script>
 </body>
+
 
 
 
