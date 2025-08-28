@@ -76,73 +76,53 @@
 </div>
 <script>
   const DEFAULT_WIDTH = 960;
-  const DEFAULT_HEIGHT = 540;
+  const DEFAULT_HEIGHT = 600;
 
-  // Get query parameters from the URL
   const params = new URLSearchParams(window.location.search);
   const listId = params.get("list");
   const gameId = params.get("id");
 
   const container = document.getElementById("game-container");
 
-  // Helper function to show error messages
   function showError(message) {
-    container.innerHTML = `<div class="error">${message}</div>`;
-    console.error(message);
+    container.innerHTML = `<div class="error">⚠️ ${message}</div>`;
+    console.error("Game Embed Error:", message);
   }
 
-  // Validate query parameters
   if (!listId || !gameId) {
     showError("Invalid game URL. Missing 'list' or 'id' parameter.");
-    return;
+  } else {
+    fetch("/embed.json")
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to load game data.");
+        return response.json();
+      })
+      .then(data => {
+        const gameList = data[listId];
+        if (!Array.isArray(gameList)) throw new Error(`List '${listId}' not found.`);
+
+        const game = gameList.find(g => String(g.id) === gameId);
+        if (!game) throw new Error(`Game with ID '${gameId}' not found.`);
+
+        document.querySelector("h1").textContent = `Playing: ${game.title || game.id}`;
+
+        const iframe = document.createElement("iframe");
+        iframe.src = game.embed;
+        iframe.width = game.width ?? DEFAULT_WIDTH;
+        iframe.height = game.height ?? DEFAULT_HEIGHT;
+        iframe.style.maxWidth = "100%";
+        iframe.style.border = "none";
+        iframe.allowFullscreen = true;
+
+        container.appendChild(iframe);
+      })
+      .catch(error => {
+        showError(error.message);
+      });
   }
-
-  // Fetch game data and embed the game
-  fetch("https://sgames1.my.to/embed.json")
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Failed to load game data.");
-      }
-      return response.json();
-    })
-    .then(data => {
-      const gameList = data[listId];
-      if (!gameList) {
-        throw new Error(`List '${listId}' not found.`);
-      }
-
-      // Convert gameId to number for comparison
-      const game = gameList.find(g => g.id === Number(gameId));
-      if (!game) {
-        throw new Error(`Game with ID '${gameId}' not found.`);
-      }
-
-      console.log("Embed URL:", game.embed);
-      console.log("Width:", game.width ?? DEFAULT_WIDTH);
-      console.log("Height:", game.height ?? DEFAULT_HEIGHT);
-      // Update title and embed the game
-      document.querySelector("h1").textContent = `Playing: ${game.id}`;
-    
-      const iframe = document.createElement("iframe");
-      iframe.src = game.embed;
-        
-        // Use fallback dimensions if not provided
-      iframe.width = game.width ?? DEFAULT_WIDTH;
-      iframe.height = game.height ?? DEFAULT_HEIGHT;
-        
-        // Optional: make it responsive
-      iframe.style.maxWidth = "100%";
-      iframe.style.border = "none";
-      iframe.allowFullscreen = true;
-        
-      container.appendChild(iframe);
-        
-    })
-    .catch(error => {
-      showError(error.message);
-    });
 </script>
 </body>
+
 
 
 
