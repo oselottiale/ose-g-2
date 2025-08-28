@@ -78,20 +78,24 @@
   const DEFAULT_WIDTH = 960;
   const DEFAULT_HEIGHT = 600;
 
-  const params = new URLSearchParams(window.location.search);
-  const listId = params.get("list");
-  const gameId = params.get("id");
-
-  const container = document.getElementById("game-container");
-
   function showError(message) {
+    const container = document.getElementById("game-container");
     container.innerHTML = `<div class="error">⚠️ ${message}</div>`;
     console.error("Game Embed Error:", message);
   }
 
-  if (!listId || !gameId) {
-    showError("Invalid game URL. Missing 'list' or 'id' parameter.");
-  } else {
+  function init() {
+    const params = new URLSearchParams(window.location.search);
+    const listId = params.get("list");
+    const gameId = params.get("id");
+
+    const container = document.getElementById("game-container");
+
+    if (!listId || !gameId) {
+      showError("Invalid game URL. Missing 'list' or 'id' parameter.");
+      return;
+    }
+
     fetch("/embed.json")
       .then(response => {
         if (!response.ok) throw new Error("Failed to load game data.");
@@ -120,8 +124,12 @@
         showError(error.message);
       });
   }
+
+  // Kick things off
+  init();
 </script>
 </body>
+
 
 
 
