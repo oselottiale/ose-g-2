@@ -89,7 +89,7 @@
     if (!listId || !gameId) {
       container.innerHTML = `<div class="error">Invalid game URL.</div>`;
     } else {
-      fetch("embed.json")
+      fetch("https://sgames1.my.to/embed.json")
         .then(res => {
           if (!res.ok) throw new Error("Failed to load game data");
           return res.json();
@@ -117,6 +117,7 @@
     }
 </script>
 </body>
+
 
 
 
