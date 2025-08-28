@@ -85,20 +85,6 @@
 
   const container = document.getElementById("game-container");
 
-  const iframe = document.createElement("iframe");
-  iframe.src = game.embed;
-    
-    // Use fallback dimensions if not provided
-  iframe.width = game.width ?? DEFAULT_WIDTH;
-  iframe.height = game.height ?? DEFAULT_HEIGHT;
-    
-    // Optional: make it responsive
-  iframe.style.maxWidth = "100%";
-  iframe.style.border = "none";
-  iframe.allowFullscreen = true;
-    
-  container.appendChild(iframe);
-
   // Helper function to show error messages
   function showError(message) {
     container.innerHTML = `<div class="error">${message}</div>`;
@@ -131,21 +117,33 @@
         throw new Error(`Game with ID '${gameId}' not found.`);
       }
 
+      console.log("Embed URL:", game.embed);
+      console.log("Width:", game.width ?? DEFAULT_WIDTH);
+      console.log("Height:", game.height ?? DEFAULT_HEIGHT);
       // Update title and embed the game
       document.querySelector("h1").textContent = `Playing: ${game.id}`;
-
+    
       const iframe = document.createElement("iframe");
       iframe.src = game.embed;
-      iframe.width = game.width || DEFAULT_WIDTH;
-      iframe.height = game.height || DEFAULT_HEIGHT;
-
+        
+        // Use fallback dimensions if not provided
+      iframe.width = game.width ?? DEFAULT_WIDTH;
+      iframe.height = game.height ?? DEFAULT_HEIGHT;
+        
+        // Optional: make it responsive
+      iframe.style.maxWidth = "100%";
+      iframe.style.border = "none";
+      iframe.allowFullscreen = true;
+        
       container.appendChild(iframe);
+        
     })
     .catch(error => {
       showError(error.message);
     });
 </script>
 </body>
+
 
 
 
