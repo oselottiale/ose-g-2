@@ -75,60 +75,66 @@
     </div>
 </div>
 <script>
-  const DEFAULT_WIDTH = 960;
-  const DEFAULT_HEIGHT = 600;
+      const DEFAULT_WIDTH  = 960;
+    const DEFAULT_HEIGHT = 600;
 
-  function showError(message) {
-    const container = document.getElementById("game-container");
-    container.innerHTML = `<div class="error">⚠️ ${message}</div>`;
-    console.error("Game Embed Error:", message);
-  }
-
-  function init() {
-    const params = new URLSearchParams(window.location.search);
-    const listId = params.get("list");
-    const gameId = params.get("id");
-
-    const container = document.getElementById("game-container");
-
-    if (!listId || !gameId) {
-      showError("Invalid game URL. Missing 'list' or 'id' parameter.");
-      return;
+    function showError(message) {
+      const container = document.getElementById("game-container");
+      container.innerHTML = `<div class="error">⚠️ ${message}</div>`;
+      console.error("Game Embed Error:", message);
     }
 
-    fetch("/embed.json")
-      .then(response => {
-        if (!response.ok) throw new Error("Failed to load game data.");
-        return response.json();
-      })
-      .then(data => {
-        const gameList = data[listId];
-        if (!Array.isArray(gameList)) throw new Error(`List '${listId}' not found.`);
+    function init() {
+      const params  = new URLSearchParams(window.location.search);
+      const listId  = params.get("list");
+      const gameId  = params.get("id");
+      const container = document.getElementById("game-container");
 
-        const game = gameList.find(g => String(g.id) === gameId);
-        if (!game) throw new Error(`Game with ID '${gameId}' not found.`);
+      if (!listId || !gameId) {
+        showError("Invalid URL: missing ‘list’ or ‘id’ parameter.");
+        return;
+      }
 
-        document.querySelector("h1").textContent = `Playing: ${game.title || game.id}`;
+      fetch("/embed.json")
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch embed.json");
+          return res.json();
+        })
+        .then(data => {
+          const gameList = data[listId];
+          if (!Array.isArray(gameList)) {
+            throw new Error(`List “${listId}” not found in JSON`);
+          }
 
-        const iframe = document.createElement("iframe");
-        iframe.src = game.embed;
-        iframe.width = game.width ?? DEFAULT_WIDTH;
-        iframe.height = game.height ?? DEFAULT_HEIGHT;
-        iframe.style.maxWidth = "100%";
-        iframe.style.border = "none";
-        iframe.allowFullscreen = true;
+          const game = gameList.find(g => String(g.id) === gameId);
+          if (!game) {
+            throw new Error(`Game ID “${gameId}” not found in list “${listId}”`);
+          }
 
-        container.appendChild(iframe);
-      })
-      .catch(error => {
-        showError(error.message);
-      });
-  }
+          document.querySelector("h1").textContent = `Playing: ${game.title || game.id}`;
 
-  // Kick things off
-  init();
+          const iframe = document.createElement("iframe");
+          iframe.src    = game.embed;
+          iframe.width  = game.width  ?? DEFAULT_WIDTH;
+          iframe.height = game.height ?? DEFAULT_HEIGHT;
+          iframe.style.maxWidth = "100%";
+          iframe.style.border   = "none";
+          iframe.allowFullscreen = true;
+
+          container.appendChild(iframe);
+        })
+        .catch(err => showError(err.message));
+    }
+
+    // Ensure the DOM is ready before running init()
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
 </script>
 </body>
+
 
 
 
